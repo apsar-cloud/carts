@@ -1,32 +1,30 @@
 pipeline {
-  agent {
-    docker {
-      image 'schoolofdevops/carts-maven'
+    agent any
+
+    tools {
+      maven 'Maven 3.6.3' 
     }
 
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'mvn compile'
-      }
-    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+                sh 'mvn clean compile'
+            }
+            }
 
-    stage('test') {
-      steps {
-        sh 'mvn clean test'
-      }
+        stage('Test') {
+            steps {
+                echo 'Testing'
+                Sh 'mvn test'
+            }
+        }
+        stage('Pachage') {
+            steps {
+                echo 'Packaging....'
+                sh 'mvn package -DskipTests'
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
     }
-
-    stage('package') {
-      steps {
-        sh 'mvn package -DskipTests'
-        archiveArtifacts '**/target/*.jar'
-      }
-    }
-
-  }
-  tools {
-    maven 'Maven 3.6.3'
-  }
 }
